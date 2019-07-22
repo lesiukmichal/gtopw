@@ -35,12 +35,18 @@ int main(int argc, char *argv[]) {
 	Keywords keys;
 	Init();
 	string inpname;
+
+	// define input for debuging pourposes (MS)
+	#ifdef GTOPW_DEBUG
+	inpname = "minimal_test.inp";
+	#else
 	if (argc > 1) {
 		inpname = argv[1];
 	} else {
 		cout << " Name of the input file not specified! Emergency halt." << endl;
 		exit(EXIT_FAILURE);
 	};
+	#endif
 
 	/* read the $BASIS keyword */
 	vector<GaussC> basis;
@@ -57,12 +63,33 @@ int main(int argc, char *argv[]) {
 	string line, name;
 	stringstream ss;
 
-	/* read destination path (MS)*/
+	// read destination path (MS)
 	ifile.open(inpname);
 	while (getline(ifile, line))
 		if (line == "$PATH") {
 			getline(ifile, line);
 			keys.path = line;
+			break;
+		};
+	ifile.close();
+	line.clear();
+
+	// read representation [cartesian / spherical] (MS)
+	ifile.open(inpname);
+	while (getline(ifile, line))
+		if (line == "$REPRESENTATION") {
+			keys.cart = false;
+			keys.spher = false;
+			while(getline(ifile, line)) {
+				if(line == "cartesian")
+					keys.cart = true;
+				else if(line == "spherical")
+					keys.spher = true;
+				else if(line == "$END")
+					break;
+				else
+					throw std::runtime_error("Unknown parameter for $REPRESENTATION");
+			}
 			break;
 		};
 	ifile.close();
@@ -299,67 +326,67 @@ int main(int argc, char *argv[]) {
 
 	/* memory for complete matrices */
 	arr1d<cdouble> ovrl_crt(num_crt2);
-	arr1d<cdouble> ovrl_sph(num_crt2);
+	arr1d<cdouble> ovrl_sph(num_sph2);
 
 	arr1d<cdouble> kin_crt(num_crt2);
-	arr1d<cdouble> kin_sph(num_crt2);
+	arr1d<cdouble> kin_sph(num_sph2);
 
 	arr1d<cdouble> nuc_crt(num_crt2);
-	arr1d<cdouble> nuc_sph(num_crt2);
+	arr1d<cdouble> nuc_sph(num_sph2);
 
 	arr1d<cdouble> bare_crt(num_crt2);
-	arr1d<cdouble> bare_sph(num_crt2);
+	arr1d<cdouble> bare_sph(num_sph2);
 
 	arr1d<cdouble> dipx_crt(num_crt2);
-	arr1d<cdouble> dipx_sph(num_crt2);
+	arr1d<cdouble> dipx_sph(num_sph2);
 
 	arr1d<cdouble> dipy_crt(num_crt2);
-	arr1d<cdouble> dipy_sph(num_crt2);
+	arr1d<cdouble> dipy_sph(num_sph2);
 
 	arr1d<cdouble> dipz_crt(num_crt2);
-	arr1d<cdouble> dipz_sph(num_crt2);
+	arr1d<cdouble> dipz_sph(num_sph2);
 
 	arr1d<cdouble> qdxx_crt(num_crt2);
-	arr1d<cdouble> qdxx_sph(num_crt2);
+	arr1d<cdouble> qdxx_sph(num_sph2);
 
 	arr1d<cdouble> qdyy_crt(num_crt2);
-	arr1d<cdouble> qdyy_sph(num_crt2);
+	arr1d<cdouble> qdyy_sph(num_sph2);
 
 	arr1d<cdouble> qdzz_crt(num_crt2);
-	arr1d<cdouble> qdzz_sph(num_crt2);
+	arr1d<cdouble> qdzz_sph(num_sph2);
 
 	arr1d<cdouble> qdxy_crt(num_crt2);
-	arr1d<cdouble> qdxy_sph(num_crt2);
+	arr1d<cdouble> qdxy_sph(num_sph2);
 
 	arr1d<cdouble> qdxz_crt(num_crt2);
-	arr1d<cdouble> qdxz_sph(num_crt2);
+	arr1d<cdouble> qdxz_sph(num_sph2);
 
 	arr1d<cdouble> qdyz_crt(num_crt2);
-	arr1d<cdouble> qdyz_sph(num_crt2);
+	arr1d<cdouble> qdyz_sph(num_sph2);
 
 	arr1d<cdouble> grdx_crt(num_crt2);
-	arr1d<cdouble> grdx_sph(num_crt2);
+	arr1d<cdouble> grdx_sph(num_sph2);
 
 	arr1d<cdouble> grdy_crt(num_crt2);
-	arr1d<cdouble> grdy_sph(num_crt2);
+	arr1d<cdouble> grdy_sph(num_sph2);
 
 	arr1d<cdouble> grdz_crt(num_crt2);
-	arr1d<cdouble> grdz_sph(num_crt2);
+	arr1d<cdouble> grdz_sph(num_sph2);
 
 	arr1d<cdouble> tx_crt(num_crt2);
-	arr1d<cdouble> tx_sph(num_crt2);
+	arr1d<cdouble> tx_sph(num_sph2);
 
 	arr1d<cdouble> ty_crt(num_crt2);
-	arr1d<cdouble> ty_sph(num_crt2);
+	arr1d<cdouble> ty_sph(num_sph2);
 
 	arr1d<cdouble> tz_crt(num_crt2);
-	arr1d<cdouble> tz_sph(num_crt2);
+	arr1d<cdouble> tz_sph(num_sph2);
 
 	arr1d<cdouble> angz_crt(num_crt2);
-	arr1d<cdouble> angz_sph(num_crt2);
+	arr1d<cdouble> angz_sph(num_sph2);
 
 	arr1d<cdouble> capi_crt(num_crt2);
-	arr1d<cdouble> capi_sph(num_crt2);
+	arr1d<cdouble> capi_sph(num_sph2);
 
 	/* memory for shell data */
 	arr1d<cdouble> shl_crt_s(shl_siz_crt2);
@@ -1237,8 +1264,8 @@ int main(int argc, char *argv[]) {
 
 	/* write the one-electron integrals to the disk - cartesian */
 
-	if(num_ints != 0) {
-		std::ofstream ofs(keys.file1E, std::ios::out | std::ios::binary);
+	if(num_ints != 0 && keys.cart) {
+		std::ofstream ofs(keys.file1E_crt, std::ios::out | std::ios::binary);
 
 		/*check the file1E path (MS)*/
 		if (!ofs.is_open()) {
@@ -1276,37 +1303,37 @@ int main(int argc, char *argv[]) {
 	};
 
 	/* write the one-electron integrals to the disk - spherical */
-	/*
-    std::ofstream ofs( keys.file1E, std::ios::out|std::ios::binary );
-    
-    WriteDown( ovrl_sph.v, num_sph2, ofs );
-    WriteDown( kin_sph.v , num_sph2, ofs );
-    WriteDown( nuc_sph.v , num_sph2, ofs );
-    WriteDown( bare_sph.v, num_sph2, ofs );
-    
-    WriteDown( dipx_sph.v, num_sph2, ofs );
-    WriteDown( dipy_sph.v, num_sph2, ofs );
-    WriteDown( dipz_sph.v, num_sph2, ofs );
-     
-    WriteDown( qdxx_sph.v, num_sph2, ofs );
-    WriteDown( qdyy_sph.v, num_sph2, ofs );
-    WriteDown( qdzz_sph.v, num_sph2, ofs );
-    WriteDown( qdxy_sph.v, num_sph2, ofs );
-    WriteDown( qdxz_sph.v, num_sph2, ofs );
-    WriteDown( qdyz_sph.v, num_sph2, ofs );
-    
-    WriteDown( grdx_sph.v, num_sph2, ofs );
-    WriteDown( grdy_sph.v, num_sph2, ofs );
-    WriteDown( grdz_sph.v, num_sph2, ofs );
-    
-    WriteDown( tx_sph.v  , num_sph2, ofs );
-    WriteDown( ty_sph.v  , num_sph2, ofs );
-    WriteDown( tz_sph.v  , num_sph2, ofs );
-    
-    WriteDown( capi_sph.v, num_crt2, ofs );
-    
-    ofs.close();
-    */
+	if(num_ints != 0 && keys.spher) {
+    	std::ofstream ofs( keys.file1E_sph, std::ios::out|std::ios::binary );
+	
+    	WriteDown( ovrl_sph.v, num_sph2, ofs );
+    	WriteDown( kin_sph.v , num_sph2, ofs );
+    	WriteDown( nuc_sph.v , num_sph2, ofs );
+    	WriteDown( bare_sph.v, num_sph2, ofs );
+	
+    	WriteDown( dipx_sph.v, num_sph2, ofs );
+    	WriteDown( dipy_sph.v, num_sph2, ofs );
+    	WriteDown( dipz_sph.v, num_sph2, ofs );
+	
+    	WriteDown( qdxx_sph.v, num_sph2, ofs );
+    	WriteDown( qdyy_sph.v, num_sph2, ofs );
+    	WriteDown( qdzz_sph.v, num_sph2, ofs );
+    	WriteDown( qdxy_sph.v, num_sph2, ofs );
+    	WriteDown( qdxz_sph.v, num_sph2, ofs );
+    	WriteDown( qdyz_sph.v, num_sph2, ofs );
+	
+    	WriteDown( grdx_sph.v, num_sph2, ofs );
+    	WriteDown( grdy_sph.v, num_sph2, ofs );
+    	WriteDown( grdz_sph.v, num_sph2, ofs );
+	
+    	WriteDown( tx_sph.v  , num_sph2, ofs );
+    	WriteDown( ty_sph.v  , num_sph2, ofs );
+    	WriteDown( tz_sph.v  , num_sph2, ofs );
+	
+    	WriteDown( capi_sph.v, num_sph2, ofs );
+	
+    	ofs.close();
+	};
 
 	// PrintCMatrix( ovrl_crt.v , num_crt );
 
