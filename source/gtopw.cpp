@@ -289,17 +289,21 @@ int main(int argc, char *argv[]) {
 			keys.cap_on = atof(line.c_str());
 			getline(ifile, line);
 			keys.cap_mul = atof(line.c_str());
+            getline(ifile, line);
+			keys.cap_pow = atoi(line.c_str());
 			break;
 		};
 
-	if (keys.cap_on < 0.0 ||
-	    keys.cap_mul < 0.0)
+	if (keys.cap_on  < 0.0 ||
+	    keys.cap_mul < 0.0 || 
+        keys.cap_pow <= 0 )
 		keys.capi = false;  /// fail-safe
 
 	if (keys.capi) {
 		cout << " Complex absorbing potentials parameters:" << endl;
 		cout << "  Onset of the potential   = " << keys.cap_on << endl;
 		cout << "  Multiplicative parameter = " << keys.cap_mul << endl;
+        cout << "  R-R_0 power parameter    = " << keys.cap_pow << endl;
 	};
 	cout << endl;
 	ifile.close();
@@ -308,7 +312,6 @@ int main(int argc, char *argv[]) {
 	print_if_math_errors_set(cout);
 	reset_math_errors();
 	cout << "\n\n";
-
 
 	/* ---------------------------------- */
 	/* ----- ONE-ELECTRON INTEGRALS ----- */
@@ -665,21 +668,19 @@ int main(int argc, char *argv[]) {
 					cap_rad.zero();
 					cap_tmp.zero();
 					if (keys.capi) {
-						CAPRadFac(lij, lij + 4, sqrt(kP2) * keys.cap_on,
-						          aij * keys.cap_on * keys.cap_on, cap_rad.v);
-
-						///for(int l=0; l<=lij; l++) for(int n=l+2; n<=lij+4; n++)
-						///    cout << l << " " << n << " " << cap_rad.v[l][n] << endl;
+						CAPRadFac(lij, lij + 2, keys.cap_pow, 
+                                  sqrt(kP2) * keys.cap_on,
+						          aij * keys.cap_on * keys.cap_on, 
+                                  cap_rad.v);
 
 						usint mij;
 						double pre_fac;
-						pre_fac = 4.0 * M_PI * pow(keys.cap_on, lij + 5);
+						pre_fac = 4.0 * M_PI * pow(keys.cap_on, lij + 3 + keys.cap_pow );
 
 						for (mij = 0; mij < cap_tmp.num; mij++) {
 							II = 1.0;
 							for (usint L = 0; L <= lij; L++) {
-								cap_tmp[mij] += II * cap_ang.v[L][mij] *
-								                (cap_rad.v[L][lij + 4] - 2.0 * cap_rad.v[L][lij + 3] + cap_rad.v[L][lij + 2]);
+								cap_tmp[mij] += II * cap_ang.v[L][mij] * cap_rad.v[L][lij + 2];
 								II = II * I;
 							};
 							cap_tmp[mij] = cap_tmp[mij] * pre_fac;
@@ -1849,7 +1850,7 @@ int main(int argc, char *argv[]) {
 								full_trans_crt.to_disk(tot_2E, keys.thrsh, ofs_2E);
 							}
 
-							///full_trans_crt.print();
+							///full_trans_crt.print( 1.0e-14 );
 						};
 		}
 

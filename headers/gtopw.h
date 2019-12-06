@@ -165,6 +165,7 @@ class Keywords
     double thrsh;
     double cap_on;
     double cap_mul;
+    int cap_pow;
 
     usint n_rad;
     usint lproj_max;
@@ -196,6 +197,7 @@ class Keywords
         rad_stp = 0.0;
         cap_on = 10.0;
         cap_mul = 1.0;
+        cap_pow = 2;
     };
 
     void name_me(const std::string name)
@@ -317,10 +319,5 @@ inline void print_if_math_errors_set(std::ostream& os) {
 inline void reset_math_errors() {
     std::feclearexcept(FE_ALL_EXCEPT);
 }
-
-
-
-
-
 
 #endif //GTOPW_H
